@@ -14,7 +14,7 @@ function Post({ name, description, message, photoUrl }) {
             <Avatar />
             <div className="post__info">
                 <h2>Omar Abouelkheir</h2>
-                <p>Description</p>
+                <p>{description}</p>
             </div>
         </div>
 

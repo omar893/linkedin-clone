@@ -8,18 +8,28 @@ import SubscriptionsIcon from '@mui/icons-material/Subscriptions';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import CalendarViewDayIcon from '@mui/icons-material/CalendarViewDay';
 import { db, auth } from './firebase';
-import { collection, addDoc, getDocs, onSnapshot } from "firebase/firestore";
+import { collection, addDoc, getDocs, onSnapshot, Timestamp} from "firebase/firestore";
 
 function Feed() {
   const [input, setInput] = useState("");
   const [posts, setPosts] = useState([]);
 
+  const sortingFunc = (a, b) => {
+    if(a.data().timestamp.valueOf() > b.data().timestamp.valueOf())
+      return -1;
+    else if(a.data().timestamp.valueOf() < b.data().timestamp.valueOf())
+      return 1;
+    return 0;
+  }
+
   useEffect(() => {
     onSnapshot(collection(db, "posts"), (snapshot) => {
-      setPosts(snapshot.docs.map(doc => ({
+      console.log(snapshot.docs)
+      setPosts(snapshot.docs.sort(sortingFunc).map(doc => ({
+        data: doc.data(),
         id: doc.id,
-        data:doc
-      })))
+        }
+        )))
     });
   }, []);
 
@@ -31,7 +41,10 @@ function Feed() {
       description: "this is a test",
       message: input,
       photoUrl: '',
+      timestamp: Timestamp.now(),
     });
+
+    setInput("");
   };
 
   return (
@@ -66,10 +79,6 @@ function Feed() {
             photoUrl={photoUrl} 
           />
         ))}
-        {/* <Post 
-          name='Omar Abouelkheir' 
-          description='This is a test'
-          message='WOW this worked' /> */}
     </div>
   )
 }
